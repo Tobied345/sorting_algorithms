@@ -1,48 +1,58 @@
 #include "sort.h"
-
 /**
- * insertion_sort_list - sorts a doubly linked list of integers
- * in ascending order using the Insertion sort algorithm
- * prints the list after each time you swap two elements
+ * insertion_sort_list - sort a dlist via insertion sort
+ * @list: the list to sort
  *
- * @list: pointer to the linked list to sort
+ *
  */
 void insertion_sort_list(listint_t **list)
 {
-	listint_t *current, *next, *prev;
+	/* declarations */
+	listint_t *a, *b;
 
-	/* An list does not need to be sorted if its size is less than 2 */
-	if (list == NULL || *list == NULL || (*list)->next == NULL)
+	/* check for bad things */
+	if (!(list && *list && (*list)->next))
 		return;
 
-	current = (*list)->next;
-	while (current)
+	/* set up for some insertion sort & swap */
+	a = (*list)->next;
+
+	while (a)
 	{
-		next = current->next;
-
-		/* if 2 adjacent nodes are out of order */
-		while (current->prev && (current->n < current->prev->n))
+		b = a;
+		a = a->next;
+		while (b && b->prev)
 		{
-			/* swap current and current->prev */
-			prev = current->prev;
-
-			current->prev = prev->prev;
-			if (current->prev)
-				current->prev->next = current;
+			if (b->prev->n > b->n)
+			{
+				swapper(b->prev, b);
+				if (!b->prev)
+					*list = b;
+				/* cast to const for print func */
+				print_list((const listint_t *)*list);
+			}
 			else
-				*list = current;  /* update the head of the list */
-
-			prev->next = current->next;
-			if (prev->next)
-				prev->next->prev = prev;
-
-			current->next = prev;
-			prev->prev = current;
-
-			/* print list */
-			print_list(*list);
+				b = b->prev;
 		}
-
-		current = next;
 	}
+
+}
+
+
+/**
+ * swapper - a function to help swap 2 nodes in a dlist
+ * @a: one node
+ * @b: the other node
+ *
+ */
+void swapper(listint_t *a, listint_t *b)
+{
+	if (a->prev)
+		a->prev->next = b;
+	if (b->next)
+		b->next->prev = a;
+	a->next = b->next;
+	b->prev = a->prev;
+	a->prev = b;
+	b->next = a;
 }
